@@ -1,20 +1,23 @@
+#chargement des packages
 library(shiny)
 
-# Define UI for application that draws a histogram
+# Define UI for application
 fluidPage(
 
-    # Application title
+    # titre de l'application
     titlePanel("Greentech solution for Enedis"),
-    
+   
+    #Barre latéral 
     page_sidebar(
       title = "Options",
-      sidebar = sidebar("Barre latéral",),
+      sidebar = sidebar("Barre latéral"),
       card(
         card_header(""),
         #insérez un graphique ?
       )
     ),
-    theme = bs_theme(preset = "minty")
+    #utilisation d'un theme prédefini
+    theme = bs_theme(preset = "minty") 
 )
 
 
