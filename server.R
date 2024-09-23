@@ -1,3 +1,6 @@
+if(!require(shiny)) install.packages("shiny")
+if(!require(bslib)) install.packages("bslib")
+
 library(shiny)
 library(bslib)
 
