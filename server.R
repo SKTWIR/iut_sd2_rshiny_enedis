@@ -1,10 +1,16 @@
 #verification du besoin d'installer des packages
 if(!require(shiny)) install.packages("shiny")
 if(!require(bslib)) install.packages("bslib")
+if(!require(shinymanager)) install.packages("shinymanager")
 
-#chargement des packages
+#chargement des packages :
+
+#sert au fonctionnement de l'application
 library(shiny)
+#theme de l'application
 library(bslib)
+#gestion des mots de passe
+library(shinymanager)
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
