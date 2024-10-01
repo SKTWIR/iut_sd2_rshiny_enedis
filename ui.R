@@ -30,39 +30,45 @@ fluidPage(
 
     # titre de l'application
     titlePanel("Greentech solution for Enedis"),
-   
-    #Barre latéral 
-    page_sidebar(
-      title = "Options",
-      sidebar = sidebar("Barre latéral"),
-      card(
-        card_header(""),
-        card_header("graphique de je sais pas quoi"),
-        #insérez un graphique ?
-      )
-    ),
+    
+    
     tabsetPanel(
       # Premier onglet
       tabPanel("Contexte", 
                h2("Contexte de l'application"),
-               p("premier onglet")),
+               p("premier onglet"),
+               
+               #création d'une carte du lozère
+               #https://rstudio.github.io/leaflet/articles/markers.html
+               ),
       
       # Deuxième onglet
       tabPanel("Onglet 2", 
                h2("Contenu du deuxième onglet"),
+               #Barre latéral 
+               page_sidebar(
+                 title = "Options",
+                 sidebar = sidebar("Barre latéral"),
+                 card(
+                   card_header(""),
+                   card_header("graphique de je sais pas quoi"),
+                   #insérez un graphique ?
+                 )
+               ),
                p("Ceci est l'onglet 2")),
       
       # Troisième onglet
       tabPanel("Onglet 3", 
-               h2("Contenu du troisième onglet"),
-               p("Ceci est l'onglet 3")),
+               h3("Contenu du troisième onglet"),
+               p("Ceci est l'onglet 3"),
+               card(
+                 card_header("flop"))),
       
       # Quatrième onglet
       tabPanel("Onglet 4", 
                h2("Contenu du troisième onglet"),
                p("Ceci est l'onglet 4"))
     ),
-    
-    
+
     theme = bs_theme(preset = "darkly")
 )
