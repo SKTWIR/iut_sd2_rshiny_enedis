@@ -2,6 +2,7 @@
 if(!require(shiny)) install.packages("shiny")
 if(!require(bslib)) install.packages("bslib")
 if(!require(shinymanager)) install.packages("shinymanager")
+if(!require(sf)) install.packages("sf")
 
 #chargement des packages :
 
@@ -11,6 +12,9 @@ library(shiny)
 library(bslib)
 #gestion des mots de passe
 library(shinymanager)
+#pr créer un map
+library(sf)
+
 
 
 # define some basic credentials (on data.frame) j'ai pas réussi a faire fonctionner le truc mdrrr
@@ -27,7 +31,13 @@ credentials <- data.frame(
 
 # Define UI for application
 fluidPage(
+  
+  #côté UI mise en place de l'affichage
+  #tags$h2("My secure application"),
+  #verbatimTextOutput("auth_output"),
+  
 
+  
     # titre de l'application
     titlePanel("Greentech solution for Enedis"),
     
@@ -72,3 +82,4 @@ fluidPage(
 
     theme = bs_theme(preset = "darkly")
 )
+#ui <- secure_app(ui)
