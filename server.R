@@ -21,8 +21,7 @@ function(input, output, session) {
   #check_credentials = check_credentials(credentials))
   
   #output$auth_output <- renderPrint({
-  #reactiveValuesToList(res_auth)
-  #})
+  #reactiveValuesToList(res_auth)})
 
   theme = bs_theme() #appelle de la fonction qui sert a avoir un thème
   
