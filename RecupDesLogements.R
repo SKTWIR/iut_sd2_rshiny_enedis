@@ -121,3 +121,6 @@ Lg = rbind(df,df2)
 #Jointure avec adresses
 
 Logements = merge(Lg,adresses_48, by.x ="Identifiant__BAN", by.y = "id")
+
+#création du CSV qui permet de faire le rmarkdown etc
+write.table(Logements, file = "Logement_Lozère.csv", sep = ";", dec = ".")
