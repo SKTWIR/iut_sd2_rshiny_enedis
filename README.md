@@ -53,4 +53,6 @@
  
  Cartes : des points cliquable pour les logements avec des informations (DPE, consommation, age du bâtiment)
 </details>
-https://github.com/slopp/scheduledsnow?tab=readme-ov-file
+exemple : https://github.com/slopp/scheduledsnow?tab=readme-ov-file
+theme : https://rstudio.github.io/shinythemes/
+carte cliquable qui set filter : https://www.r-bloggers.com/2024/06/interactive-map-filter-in-shiny/#google_vignette
