@@ -53,3 +53,4 @@
  
  Cartes : des points cliquable pour les logements avec des informations (DPE, consommation, age du bâtiment)
 </details>
+https://github.com/slopp/scheduledsnow?tab=readme-ov-file
