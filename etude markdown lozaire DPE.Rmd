@@ -3,29 +3,105 @@ title: "Étude DPE du Lozère"
 author: "RAHMANI Ibrahim et WOUTERS Jade"
 date: "`r Sys.Date()`"
 output: word_document
+params:
+  mon_parametre: "Sepal.Width"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+#```{r}
+#```
+
+```{r, echo=FALSE, message=FALSE, eval=TRUE}
+
+#aide personnelle a la réalisation du rmarkdown    
+#echo : Affiche ou non le code.
+#eval : Exécute ou non le code.
+#warning : Affiche ou non les warnings.
+#message : Affiche ou non les messages.
+
+install.packages("ggplot2")  
+library(ggplot2) 
+
+
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 setwd("C:/Users/irahm/OneDrive/Bureau/app r/iut_sd2_rshiny_enedis") #redirection vers le dossier qui contient le fichier logement lozère
 Logement = read.csv2("Logement_Lozère.csv", sep = ";", dec = ".")
 ```
 
 
-```{r}
+```{r, echo=FALSE, message=FALSE}
 summary(Logement)
 ```
 
 
 ```{r}
 mean(Logement$Coût_total_5_usages)
+```
+#présentation de la population
+Ici la population est celle des habitation du Lozère (48) on retrouve dans notre CSV 
+```{r}
+taille = nrow(Logement)
+```
+2594 logement issue du département 
+
+
+```{r}
+a = aggregate(Coût_total_5_usages ~ Etiquette_DPE, Logement, FUN = mean)
+print(a)
+
+ggplot(data = a, aes(x = Etiquette_DPE, y = Coût_total_5_usages)) +
+  geom_bar(stat = "identity", fill = "lightblue") +  # Créer les barres avec les moyennes
+  labs(title = "Moyenne du Coût Total par Etiquette DPE",
+       x = "Etiquette DPE",
+       y = "Moyenne du Coût Total (5 usages)") +  # Ajouter les titres et labels des axes
+  theme_minimal()
+print("nous pouvons remarquer que plus l'étiquette de DPE est basse plus le cout total est elevé en moyennes")
+```
+
+Le cout des 5 usages est une variable qui est composé des couts suivant :
+1. chauffage
+2. éclairage
+3. refroidissement
+4. Eau Chause Sanitaire (ECS)
+5. auxiliaire
+
+le but va être de voir lequel de ces 5 variable affecte le plus le cout total des 5 usages.
+
+```{r}
+b = aggregate(Emission_GES_5_usages ~ Etiquette_DPE, Logement, FUN = mean)
+print(b)
+
+ggplot(data = b, aes(x = Etiquette_DPE, y = Emission_GES_5_usages)) +
+  geom_bar(stat = "identity", fill = "lightblue") +  # Créer les barres avec les moyennes
+  labs(title = "Moyenne d'emission de GES en fonction de l'étiquette DPE",
+       x = "Etiquette DPE",
+       y = "emission GES 5 usages") +  # Ajouter les titres et labels des axes
+  theme_minimal()
+print("nous pouvons remarquer que les emissions de GES sont plus importantes lorsqu'un appartemment est étiquette D ou +")
+```
+
+```{r}
+c = aggregate(Coût_ECS ~ Etiquette_DPE, Logement, FUN = mean)
+print(c)
+
+ggplot(data = c, aes(x = Etiquette_DPE, y = Coût_ECS)) +
+  geom_bar(stat = "identity", fill = "lightblue") +  # Créer les barres avec les moyennes
+  labs(title = "Moyenne du Coût ECS par Etiquette DPE",
+       x = "Etiquette DPE",
+       y = "moyenne cout ECS") +  # Ajouter les titres et labels des axes
+  theme_minimal()
+#print("")
+```
+```{r}
+d = aggregate(Coût_chauffage ~ Etiquette_DPE, Logement, FUN = mean)
+print(d)
+
+ggplot(data = d, aes(x = Etiquette_DPE, y = Coût_chauffage)) +
+  geom_bar(stat = "identity", fill = "lightblue") +  # Créer les barres avec les moyennes
+  labs(title = "Moyenne du Coût du chauffage par Etiquette DPE",
+       x = "Etiquette DPE",
+       y = "moyenne cout chauffage") +  # Ajouter les titres et labels des axes
+  theme_minimal()
+#print("")
 ```
