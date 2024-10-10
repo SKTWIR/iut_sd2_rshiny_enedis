@@ -7,9 +7,6 @@ params:
   mon_parametre: "Sepal.Width"
 ---
 
-#```{r}
-#```
-
 ```{r, echo=FALSE, message=FALSE, eval=TRUE}
 
 #aide personnelle a la réalisation du rmarkdown    
@@ -18,7 +15,7 @@ params:
 #warning : Affiche ou non les warnings.
 #message : Affiche ou non les messages.
 
-install.packages("ggplot2")  
+if(!require(ggplot2)) install.packages("ggplot2")
 library(ggplot2) 
 
 
@@ -30,20 +27,95 @@ Logement = read.csv2("Logement_Lozère.csv", sep = ";", dec = ".")
 ```
 
 
-```{r, echo=FALSE, message=FALSE}
-summary(Logement)
+
+# Présentation de la population
+
+Ici la population est celle des habitations du Lozère (48) on retrouve dans notre CSV 2594 logement issue du département dont nous analyserons les données ci-dessous.
+
+Il existe donc :
+
+```{r, echo=FALSE}
+compte_types <- table(Logement$Type_bâtiment)
+print(compte_types)
+
+```
+graphiquement cela nous donne :
+
+```{r, echo=FALSE}
+# Transformer le tableau en dataframe
+compte_df <- as.data.frame(compte_types)
+colnames(compte_df) <- c("type_batiment", "nombre")  # Renommer les colonnes
+
+# Calculer les pourcentages
+compte_df$fraction <- compte_df$nombre / sum(compte_df$nombre)
+compte_df$percentage <- round(compte_df$fraction * 100, 1)
+
+# Créer un pie chart avec pourcentages
+ggplot(compte_df, aes(x = "", y = nombre, fill = type_batiment)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = paste0(percentage, "%")), position = position_stack(vjust = 0.5)) +
+  labs(title = "Répartition des types de bâtiments",
+       x = NULL,
+       y = NULL) +
+  theme_void() +
+  theme(legend.title = element_blank())
+
 ```
 
+Plus d'un logement sur 2 en Lozère est un appartement.
+
+# DPE des logements du Lozère
+
+```{r, echo=FALSE}
+compte_types_2 <- table(Logement$Etiquette_DPE)
+print(compte_types_2)
+
+```
+```{r, echo=FALSE}
+compte_df_2 <- as.data.frame(compte_types_2)
+colnames(compte_df_2) <- c("Etiquette_DPE", "nombre")
+
+
+ggplot(compte_df_2, aes(x = Etiquette_DPE, y = nombre, fill = Etiquette_DPE)) +
+  geom_bar(stat = "identity", width = 0.7) +  # Créer les bâtons
+  geom_text(aes(label = nombre), vjust = -0.5, size = 4) +  # Ajouter les nombres au-dessus des barres
+  labs(title = "Répartition des étiquettes DPE",
+       x = "Étiquette DPE",
+       y = "Nombre d'occurrences") +
+  theme_minimal() +  # Appliquer un thème minimaliste
+  theme(legend.position = "none")  # Supprimer la légende
+
+```
+
+il y a :
+
+- 1% des logement qui ont l'étiquette PDE A
+- 3% des logement qui ont l'étiquette PDE B
+- 7% des logement qui ont l'étiquette PDE C
+- 26% des logement qui ont l'étiquette PDE D
+- 30% des logement qui ont l'étiquette PDE E
+- 17% des logement qui ont l'étiquette PDE F
+- 15% des logement qui ont l'étiquette PDE G
+
+Près d'1/3 des logements de notre CSV est considéré comme étant une **passoire thermique**, cela signifie qu'ils ne peuvent être mis à la vente ou a la location sans travaux effectué au préalable et mises à jour des étiquettes de DPE de ces logements.
+
+Le cout des 5 usages est une variable qui est composé des couts suivant :
+
+1. chauffage
+2. éclairage
+3. refroidissement
+4. Eau Chause Sanitaire (ECS)
+5. auxiliaire
+
+le but va être de voir lequel de ces 5 variable affecte le plus le cout total des 5 usages.
+
+
+En moyenne pour une habitation en lozère il faut débourser 2014€ pour un appartement, mais cette moyenne ne prend pas en compte les étiquette de DPE
 
 ```{r}
 mean(Logement$Coût_total_5_usages)
 ```
-#présentation de la population
-Ici la population est celle des habitation du Lozère (48) on retrouve dans notre CSV 
-```{r}
-taille = nrow(Logement)
-```
-2594 logement issue du département 
 
 
 ```{r}
@@ -59,14 +131,7 @@ ggplot(data = a, aes(x = Etiquette_DPE, y = Coût_total_5_usages)) +
 print("nous pouvons remarquer que plus l'étiquette de DPE est basse plus le cout total est elevé en moyennes")
 ```
 
-Le cout des 5 usages est une variable qui est composé des couts suivant :
-1. chauffage
-2. éclairage
-3. refroidissement
-4. Eau Chause Sanitaire (ECS)
-5. auxiliaire
 
-le but va être de voir lequel de ces 5 variable affecte le plus le cout total des 5 usages.
 
 ```{r}
 b = aggregate(Emission_GES_5_usages ~ Etiquette_DPE, Logement, FUN = mean)
@@ -104,4 +169,11 @@ ggplot(data = d, aes(x = Etiquette_DPE, y = Coût_chauffage)) +
        y = "moyenne cout chauffage") +  # Ajouter les titres et labels des axes
   theme_minimal()
 #print("")
+
+
+
+#idée pour demain :
+#comparaison maison et appartement
+#faire disparaitre le code R du knit
+#je sais pas encore on verra
 ```
