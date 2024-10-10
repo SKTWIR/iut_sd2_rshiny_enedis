@@ -1,33 +1,48 @@
-#
-# This is the user-interface definition of a Shiny web application. You can
-# run the application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    https://shiny.posit.co/
-#
+#Installation des packages
+if (!requireNamespace("shiny", quietly = TRUE)) install.packages("shiny")
+if (!requireNamespace("bslib", quietly = TRUE)) install.packages("bslib")
+if (!requireNamespace("shinymanager", quietly = TRUE)) install.packages("shinymanager")
+if (!requireNamespace("sf", quietly = TRUE)) install.packages("sf")
+if (!requireNamespace("plotly", quietly = TRUE)) install.packages("plotly")
+if (!requireNamespace("httr", quietly = TRUE)) install.packages("httr")
+if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("jsonlite")
+if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("shinydashboard")
 
 library(shiny)
+library(bslib)
+library(shinymanager)
+library(sf)
+library(httr)
+library(jsonlite)
+library(plotly)
+library(shinydashboard)
 
-# Define UI for application that draws a histogram
-fluidPage(
+#Apparence :
 
-    # Application title
-    titlePanel("Old Faithful Geyser Data"),
-
-    # Sidebar with a slider input for number of bins
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
+dashboardPage(
+  dashboardHeader(title = "Green Tech for Enedis"),
+  
+  
+  dashboardSidebar(
+      sidebarMenu(
+      menuItem("Contexte", tabName = "contexte", icon = icon("poo")),
+      menuItem("Globale", tabName = "globale", icon = icon("th"))
+  )),
+  
+  
+  dashboardBody(
+      tabItems(
+        # CONTEXTE
+        tabItem(tabName = "contexte",h2("Contexte"),
+          fluidRow(
+            box(plotlyOutput("RepartitionConso", height = 400)),
+          )
         ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-            plotOutput("distPlot")
+        
+        # Stats Globale
+        tabItem(tabName = "globale",
+                h2("globale")
         )
-    )
+      )
+  )
 )
