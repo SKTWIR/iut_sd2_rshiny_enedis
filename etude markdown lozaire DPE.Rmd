@@ -139,7 +139,6 @@ ggplot(data = c, aes(x = Etiquette_DPE, y = Coût_ECS)) +
        x = "Etiquette DPE",
        y = "moyenne cout ECS") +  # Ajouter les titres et labels des axes
   theme_minimal()
-#print("")
 ```
 On remarque que le cout moyen est à peu près le même pour tout les types d'habitation sauf pour les habitations les plus performantes étiquettés A et B 
 
