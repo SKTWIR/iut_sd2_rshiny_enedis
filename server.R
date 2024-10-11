@@ -159,6 +159,31 @@ function(input, output, session) {
     return(graph)
   })
   
+  #création graph répartition DPE :
+  
+  output$RepartitionDPE = renderPlotly({
+  
+  compte_types_2 <- table(Logements$Etiquette_DPE)
+  #compte_types_2$CodePostal <- Logements$code_postal,
+  compte_df_2 <- as.data.frame(compte_types_2)
+  colnames(compte_df_2) <- c("Etiquette_DPE", "nombre")
+  
+  
+  graph2 = ggplot(compte_df_2, aes(x = Etiquette_DPE, y = nombre, fill = Etiquette_DPE)) +
+    geom_bar(stat = "identity", width = 0.7) +  # Créer les bâtons
+    geom_text(aes(label = nombre), vjust = -0.5, size = 4) +  # Ajouter les nombres au-dessus des barres
+    labs(title = "<b>Répartition des étiquettes DPE</b>",
+         x = "Étiquette DPE",
+         y = "Nombre d'occurrences") +
+    theme_minimal() +  # Appliquer un thème minimaliste
+    theme(legend.position = "none") # Supprimer la légende
+  
+    ggplotly(graph2)
+    
+    return(graph2)
+  })
+  
+  
   
 }
 

@@ -35,13 +35,20 @@ dashboardPage(
         # CONTEXTE
         tabItem(tabName = "contexte",h2("Contexte"),
           fluidRow(
-            box(plotlyOutput("RepartitionConso", height = 400)),
+                box(plotlyOutput("RepartitionDPE",height=350,width=600), height = 400),
+                box(strong("Les DPE de la Lozère \n"),
+                p("Enedis a fait ceci machin truc et bla bla bla"),
+                height=250
+                ),
+            box(strong("2594\n"),p("Logements"),height = 150,width=3),
+            box(height = 150,width=3)
           )
         ),
         
         # Stats Globale
         tabItem(tabName = "globale",
-                h2("globale")
+                h2("globale"),
+                fluidRow(box(plotlyOutput("RepartitionConso", height = 400)))
         )
       )
   )
