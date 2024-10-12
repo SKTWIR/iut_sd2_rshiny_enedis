@@ -1,11 +1,11 @@
 #install.packages(c("httr", "jsonlite"))
 library(httr)
 library(jsonlite)
-setwd("C:/Users/irahm/OneDrive/Bureau/app r/iut_sd2_rshiny_enedis")
+setwd("C:/Users/delli/Desktop/Projet R")
 
-ColAGarderExistants = c('Année_construction,_geopoint,Identifiant__BAN,N°DPE,Etiquette_DPE,Coordonnée_cartographique_X_(BAN),Coordonnée_cartographique_Y_(BAN),Nom__commune_(BAN),N°_département_(BAN),N°_région_(BAN),Code_postal_(BAN),Code_INSEE_(BAN),Conso_chauffage_dépensier_é_finale,Conso_chauffage_é_finale,Conso_5_usages_par_m²_é_primaire,Conso_5_usages_é_finale,Conso_ECS_é_primaire,Emission_GES_5_usages,Emission_GES_chauffage,Emission_GES_ECS,Emission_GES_5_usages_par_m²,Coût_total_5_usages,Coût_ECS,Coût_chauffage,Surface_habitable_logement,Date_établissement_DPE,Date_fin_validité_DPE,Etiquette_GES,Version_DPE,Type_énergie_n°1,Type_bâtiment,Conso_ECS_é_finale')
+ColAGarderExistants = c('Coût_auxiliaires,Conso_auxiliaires_é_finale,Conso_refroidissement,Coût_refroidissement,Coût_éclairage,Conso_éclairage_é_finale,Année_construction,_geopoint,Identifiant__BAN,N°DPE,Etiquette_DPE,Coordonnée_cartographique_X_(BAN),Coordonnée_cartographique_Y_(BAN),Nom__commune_(BAN),N°_département_(BAN),N°_région_(BAN),Code_postal_(BAN),Code_INSEE_(BAN),Conso_chauffage_dépensier_é_finale,Conso_chauffage_é_finale,Conso_5_usages_par_m²_é_primaire,Conso_5_usages_é_finale,Conso_ECS_é_primaire,Emission_GES_5_usages,Emission_GES_chauffage,Emission_GES_ECS,Emission_GES_5_usages_par_m²,Coût_total_5_usages,Coût_ECS,Coût_chauffage,Surface_habitable_logement,Date_établissement_DPE,Date_fin_validité_DPE,Etiquette_GES,Version_DPE,Type_énergie_n°1,Type_bâtiment,Conso_ECS_é_finale')
 
-adresses_48 = read.csv("adresses-48.csv",header=T,sep= ";",dec=".")
+adresses_48 = read.csv("adresses_48.csv",header=T,sep= ";",dec=".")
 code = unique(adresses_48$code_postal)
 code
 annee = seq(2021,2024,1)
@@ -62,7 +62,7 @@ print("ccc")
 
 df2 = data.frame()
 #RECUPERE LES LOGEMENTS NEUFS
-ColAGarderNeufs = c('_geopoint,Identifiant__BAN,N°DPE,Etiquette_DPE,Coordonnée_cartographique_X_(BAN),Coordonnée_cartographique_Y_(BAN),Nom__commune_(BAN),N°_département_(BAN),N°_région_(BAN),Code_postal_(BAN),Code_INSEE_(BAN),Conso_chauffage_dépensier_é_finale,Conso_chauffage_é_finale,Conso_5_usages_par_m²_é_primaire,Conso_5_usages_é_finale,Conso_ECS_é_primaire,Emission_GES_5_usages,Emission_GES_chauffage,Emission_GES_ECS,Emission_GES_5_usages_par_m²,Coût_total_5_usages,Coût_ECS,Coût_chauffage,Surface_habitable_logement,Date_établissement_DPE,Date_fin_validité_DPE,Etiquette_GES,Version_DPE,Type_énergie_n°1,Type_bâtiment,Conso_ECS_é_finale')
+ColAGarderNeufs = c('Coût_auxiliaires,Conso_auxiliaires_é_finale,Conso_refroidissement,Coût_refroidissement,Coût_éclairage,Conso_éclairage_é_finale,_geopoint,Identifiant__BAN,N°DPE,Etiquette_DPE,Coordonnée_cartographique_X_(BAN),Coordonnée_cartographique_Y_(BAN),Nom__commune_(BAN),N°_département_(BAN),N°_région_(BAN),Code_postal_(BAN),Code_INSEE_(BAN),Conso_chauffage_dépensier_é_finale,Conso_chauffage_é_finale,Conso_5_usages_par_m²_é_primaire,Conso_5_usages_é_finale,Conso_ECS_é_primaire,Emission_GES_5_usages,Emission_GES_chauffage,Emission_GES_ECS,Emission_GES_5_usages_par_m²,Coût_total_5_usages,Coût_ECS,Coût_chauffage,Surface_habitable_logement,Date_établissement_DPE,Date_fin_validité_DPE,Etiquette_GES,Version_DPE,Type_énergie_n°1,Type_bâtiment,Conso_ECS_é_finale')
 
 base_url <- "https://data.ademe.fr/data-fair/api/v1/datasets/dpe-v2-logements-neufs/lines"
 
@@ -121,6 +121,3 @@ Lg = rbind(df,df2)
 #Jointure avec adresses
 
 Logements = merge(Lg,adresses_48, by.x ="Identifiant__BAN", by.y = "id")
-
-#création du CSV qui permet de faire le rmarkdown etc
-write.table(Logements, file = "Logement_Lozère.csv", sep = ";", dec = ".")
