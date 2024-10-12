@@ -154,35 +154,103 @@ function(input, output, session) {
           y = 0.5   # Positionne la légende au milieu de la zone y
         ),
         margin = list(t = 60, b = 40, l = 40, r = 40)  # Ajustez les marges (t = top, b = bottom, l = left, r = right)
-      )
+      ) %>%
+      plotly::config(displaylogo = F)
   
     return(graph)
   })
   
   #création graph répartition DPE :
   
-  output$RepartitionDPE = renderPlotly({
+  trieEtiquette = ""
+  trieBatiment = ""
+  Nom_Etiquettes = c("A", "B", "C", "D", "E", "F", "G")
+  Nom_type_batiment = c("maison","appartement","immeuble")
   
-  compte_types_2 <- table(Logements$Etiquette_DPE)
-  #compte_types_2$CodePostal <- Logements$code_postal,
-  compte_df_2 <- as.data.frame(compte_types_2)
-  colnames(compte_df_2) <- c("Etiquette_DPE", "nombre")
-  
-  
-  graph2 = ggplot(compte_df_2, aes(x = Etiquette_DPE, y = nombre, fill = Etiquette_DPE)) +
-    geom_bar(stat = "identity", width = 0.7) +  # Créer les bâtons
-    geom_text(aes(label = nombre), vjust = -0.5, size = 4) +  # Ajouter les nombres au-dessus des barres
-    labs(title = "<b>Répartition des étiquettes DPE</b>",
-         x = "Étiquette DPE",
-         y = "Nombre d'occurrences") +
-    theme_minimal() +  # Appliquer un thème minimaliste
-    theme(legend.position = "none") # Supprimer la légende
-  
-    ggplotly(graph2)
-    
-    return(graph2)
+  observe({
+    if (input$etiquette_dpe_choix == "Tout") {
+      trieEtiquette <- Nom_Etiquettes
+    } else {
+      trieEtiquette <- input$etiquette_dpe_choix
+    }
   })
   
+  observe({
+    if (input$type_batiment_choix == "Tout") {
+      trieBatiment <- Nom_type_batiment
+    } else {
+      trieBatiment <- input$type_batiment_choix
+    }
+  })
+  
+  
+  
+  output$RepartitionDPE = renderPlotly({
+  
+    dfContexte = Logements
+    
+    if (input$type_batiment_choix != "Tout") {
+      dfContexte <- subset(dfContexte, Type_bâtiment == input$type_batiment_choix)}
+    
+    if (input$etiquette_dpe_choix != "Tout") {
+      dfContexte <- subset(dfContexte, Etiquette_DPE == input$etiquette_dpe_choix)}
+    
+    dfContexte$Etiquette_DPE <- factor(dfContexte$Etiquette_DPE, levels = Nom_Etiquettes)
+    plot_data <- table(dfContexte$Etiquette_DPE)
+    plot_data
+    plot_data = as.data.frame(plot_data)
+    
+    repartitionDPE = plot_ly(data = plot_data,x=~Var1, y=~Freq,text=~Freq, type= 'bar',
+                             marker = list(color = c('#519740', '#33cc33', '#ccff33', '#ffff00', '#ffcc00','#ff9a33','#ff0000')))%>%
+      layout(
+        title = ifelse(input$type_batiment_choix == "Tout", "Nombre de DPE pour tous les types de logements",
+                       paste("Nombre de DPE pour le type de logement :", input$type_batiment_choix)),
+        xaxis = list(title = "Étiquette DPE"),
+        yaxis = list(title = "Nombre d'occurrences"))%>%
+        plotly::config(modeBarButtonsToRemove = list(
+          'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 
+          'zoomOut2d', 'autoScale2d', 'resetScale2d', 'hoverCompareCartesian',
+          'hoverClosestCartesian', 'toggleSpikelines', 'toggleHover', 
+          'resetViews', 'sendDataToCloud'),
+          displaylogo = F)
+    
+  return(repartitionDPE)
+    
+  })
+  #FIN création graph répartition DPE :
+  
+  #INFOS :
+  
+  output$nbLogements = renderText({
+    
+  dfContexte = Logements
+  
+  if (input$type_batiment_choix != "Tout") {
+    dfContexte <- subset(dfContexte, Type_bâtiment == input$type_batiment_choix)}
+  
+  if (input$etiquette_dpe_choix != "Tout") {
+    dfContexte <- subset(dfContexte, Etiquette_DPE == input$etiquette_dpe_choix)}
+  
+  nbLogements = nrow(dfContexte)
+  
+  return(nbLogements)
+
+  })
+  
+  output$moyAnneeConstru = renderText({
+    
+    dfContexte = Logements
+    
+    if (input$type_batiment_choix != "Tout") {
+      dfContexte <- subset(dfContexte, Type_bâtiment == input$type_batiment_choix)}
+    
+    if (input$etiquette_dpe_choix != "Tout") {
+      dfContexte <- subset(dfContexte, Etiquette_DPE == input$etiquette_dpe_choix)}
+
+    moyAnneeConstru = round(mean(dfContexte$Année_construction, na.rm = T),0)
+ 
+    return(moyAnneeConstru)
+  })
   
   
 }
