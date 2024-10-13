@@ -73,6 +73,14 @@ print(compte_types_2)
 compte_df_2 <- as.data.frame(compte_types_2)
 colnames(compte_df_2) <- c("Etiquette_DPE", "nombre")
 
+# Palette de couleurs personnalisée
+couleurs <- c("A" = "#519740",  # Bleu pour A
+              "B" = "#33cc33",  # Orange pour B
+              "C" = "#ccff33",  # Vert pour C
+              "D" = "#ffff00",  # Rouge pour D
+              "E" = "#ffcc00",  # Violet pour E
+              "F" = "#ff9a33",  # Marron pour F
+              "G" = "#ff0000")  # Rose pour G
 
 ggplot(compte_df_2, aes(x = Etiquette_DPE, y = nombre, fill = Etiquette_DPE)) +
   geom_bar(stat = "identity", width = 0.7) +  # Créer les bâtons
@@ -80,8 +88,10 @@ ggplot(compte_df_2, aes(x = Etiquette_DPE, y = nombre, fill = Etiquette_DPE)) +
   labs(title = "Répartition des étiquettes DPE",
        x = "Étiquette DPE",
        y = "Nombre d'appartement") +
+  scale_fill_manual(values = couleurs) +  # Appliquer la palette de couleurs personnalisée
   theme_minimal() +  # Appliquer un thème minimaliste
   theme(legend.position = "none")  # Supprimer la légende
+
 
 ```
 
