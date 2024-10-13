@@ -1,0 +1,212 @@
+---
+title: "Étude DPE des habitations du Lozère"
+author: "RAHMANI Ibrahim et WOUTERS Jade"
+date: "`r Sys.Date()`"
+output: html_document
+params:
+  mon_parametre: "Sepal.Width"
+---
+
+```{r, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+
+#aide personnelle a la réalisation du rmarkdown    
+#echo : Affiche ou non le code.
+#eval : Exécute ou non le code.
+#warning : Affiche ou non les warnings.
+#message : Affiche ou non les messages.
+
+if(!require(ggplot2)) install.packages("ggplot2")
+library(ggplot2) 
+
+
+```
+
+```{r, echo=FALSE, message=FALSE}
+setwd("C:/Users/irahm/OneDrive/Bureau/app r/iut_sd2_rshiny_enedis") #redirection vers le dossier qui contient le fichier logement lozère
+Logement = read.csv2("Logement_Lozère.csv", sep = ";", dec = ".")
+```
+
+
+
+# Présentation de la population
+
+Ici la population est celle des habitations du Lozère (48) on retrouve dans notre CSV 2594 logement issue du département dont nous analyserons les données ci-dessous.
+
+Il existe donc :
+
+```{r, echo=FALSE}
+compte_types <- table(Logement$Type_bâtiment)
+print(compte_types)
+
+```
+graphiquement cela nous donne :
+
+```{r, echo=FALSE, message=FALSE}
+# Transformer le tableau en dataframe
+compte_df <- as.data.frame(compte_types)
+colnames(compte_df) <- c("type_batiment", "nombre")  # Renommer les colonnes
+
+# Calculer les pourcentages
+compte_df$fraction <- compte_df$nombre / sum(compte_df$nombre)
+compte_df$percentage <- round(compte_df$fraction * 100, 1)
+
+# Créer un pie chart avec pourcentages
+ggplot(compte_df, aes(x = "", y = nombre, fill = type_batiment)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = paste0(percentage, "%")), position = position_stack(vjust = 0.5)) +
+  labs(title = "Répartition des types de bâtiments",
+       x = NULL,
+       y = NULL) +
+  theme_void() +
+  theme(legend.title = element_blank())
+```
+
+Plus d'un logement sur 2 en Lozère est un appartement.
+
+La répartition des étiquettes DPE de ces habitions est ainsi constitué :
+```{r, echo=FALSE, warning=FALSE}
+compte_types_2 <- table(Logement$Etiquette_DPE)
+print(compte_types_2)
+```
+```{r, echo=FALSE}
+compte_df_2 <- as.data.frame(compte_types_2)
+colnames(compte_df_2) <- c("Etiquette_DPE", "nombre")
+
+# Palette de couleurs personnalisée
+couleurs <- c("A" = "#519740",  # Bleu pour A
+              "B" = "#33cc33",  # Orange pour B
+              "C" = "#ccff33",  # Vert pour C
+              "D" = "#ffff00",  # Rouge pour D
+              "E" = "#ffcc00",  # Violet pour E
+              "F" = "#ff9a33",  # Marron pour F
+              "G" = "#ff0000")  # Rose pour G
+
+ggplot(compte_df_2, aes(x = Etiquette_DPE, y = nombre, fill = Etiquette_DPE)) +
+  geom_bar(stat = "identity", width = 0.7) +  # Créer les bâtons
+  geom_text(aes(label = nombre), vjust = -0.5, size = 4) +  # Ajouter les nombres au-dessus des barres
+  labs(title = "Répartition des étiquettes DPE",
+       x = "Étiquette DPE",
+       y = "Nombre d'appartement") +
+  scale_fill_manual(values = couleurs) +  # Appliquer la palette de couleurs personnalisée
+  theme_minimal() +  # Appliquer un thème minimaliste
+  theme(legend.position = "none")  # Supprimer la légende
+
+
+```
+
+il y a :
+
+- 1% des logement qui sont étiquetés DPE A
+- 3% des logement qui sont étiquetés DPE B
+- 7% des logement qui sont étiquetés DPE C
+- 26% des logement qui sont étiquetés DPE D
+- 30% des logement qui sont étiquetés DPE E
+- 17% des logement qui sont étiquetés DPE F
+- 15% des logement qui sont étiquetés DPE G
+
+Près d'1/3 des logements de notre CSV sont considéré comme étant une **passoire thermique**, cela signifie qu'ils ne peuvent être mis à la vente ou a la location sans travaux effectué au préalable.
+
+# DPE des logements du Lozère
+## Cout de total des 5 usages
+
+Le cout des 5 usages est une variable qui est composé des couts suivant :
+
+1. chauffage
+2. éclairage
+3. refroidissement
+4. Eau Chause Sanitaire (ECS)
+5. auxiliaire
+
+le but va être d'étudier ces 5 variable (s'ils sont disponible dans le data frame) et regarder quel variable influe le plus sur le coût total.
+
+En moyenne pour une habitation en lozère il faut débourser :
+```{r, echo=FALSE,}
+mean(Logement$Coût_total_5_usages)
+```
+2014€ par an pour une habitation, mais cette moyenne ne prend pas en compte les étiquette de DPE. puisque les étiquettes DPE définissent la performance energétique d'une habitation on peut se deamnder si pour les plus mauvais appartement il n'y a pas un cout plus important pour une performance énergéitque égale.
+
+pour le savoir nous pouvons regarder ce graphique :
+```{r, echo=FALSE, message=TRUE, warning=FALSE}
+a = aggregate(Coût_total_5_usages ~ Etiquette_DPE, Logement, FUN = mean)
+```
+```{r, echo=FALSE, message=FALSE}
+ggplot(data = a, aes(x = Etiquette_DPE, y = Coût_total_5_usages)) +
+  geom_bar(stat = "identity", fill = "lightblue") +  # Créer les barres avec les moyennes
+  labs(title = "Moyenne du Coût Total par Etiquette DPE",
+       x = "Etiquette DPE",
+       y = "Moyenne du Coût Total (5 usages)") +  # Ajouter les titres et labels des axes
+  theme_minimal()
+
+```
+
+on remarque que effectivement les appartements avec les étiquettes DPE les plus basse coûte plus cher pour leur habitants que les habitation qui ont des étiquettes de A à D
+
+## Cout de l'ECS (Eau Chaude Sanitaire)
+```{r, echo=FALSE}
+c = aggregate(Coût_ECS ~ Etiquette_DPE, Logement, FUN = mean)
+
+
+ggplot(data = c, aes(x = Etiquette_DPE, y = Coût_ECS)) +
+  geom_bar(stat = "identity", fill = "lightblue") +  # Créer les barres avec les moyennes
+  labs(title = "Moyenne du Coût ECS par Etiquette DPE",
+       x = "Etiquette DPE",
+       y = "moyenne cout ECS") +  # Ajouter les titres et labels des axes
+  theme_minimal()
+```
+
+On remarque que le cout moyen est à peu près le même pour tout les types d'habitation sauf pour les habitations les plus performantes étiquettés A et B 
+
+## Cout du chauffage
+```{r, echo=FALSE}
+d = aggregate(Coût_chauffage ~ Etiquette_DPE, Logement, FUN = mean)
+ggplot(data = d, aes(x = Etiquette_DPE, y = Coût_chauffage)) +
+  geom_bar(stat = "identity", fill = "lightblue") +  # Créer les barres avec les moyennes
+  labs(title = "Moyenne du Coût du chauffage par Etiquette DPE",
+       x = "Etiquette DPE",
+       y = "moyenne cout chauffage") +  # Ajouter les titres et labels des axes
+  theme_minimal()
+```
+
+Nous pouvons aussi nous rendre compte de la différence de performance entre les différentes types de logement avec les étiquette DPE. le cout moyen du chauffage est relativement le même entre les étiquettes A et D après cela, les coûts explose
+
+```{r, echo=FALSE}
+b = aggregate(Emission_GES_5_usages ~ Etiquette_DPE, Logement, FUN = mean)
+
+
+ggplot(data = b, aes(x = Etiquette_DPE, y = Emission_GES_5_usages)) +
+  geom_bar(stat = "identity", fill = "lightblue") +  # Créer les barres avec les moyennes
+  labs(title = "Moyenne d'emission de GES en fonction de l'étiquette DPE",
+       x = "Etiquette DPE",
+       y = "emission GES 5 usages") +  # Ajouter les titres et labels des axes
+  theme_minimal()
+```
+
+Nous pouvons voir que les performances d'émissions de GES sont plus ou moins similaire de l'étiquettes A à D et qu'à partir du reste les émissions explosent, cela est surêment le résultats de la mauvaise performances énergétique des habitation, puisque entre une habitation A et F l'habitation F doit surement utiliser plus de chauffage que l'habitation étiquetté A pour être à une T° similaire
+
+## Existe-t-il un lien entre émission de GES le cout annuel
+
+Comme nous l'avons vu, le cout annuel moyen d'un appartement en Lozère est de 2014.66€, mais nous avons vu que la performance énergétique attribué avec les étiquettes DPE joue un rôle important dans le cout annuel des 5 usages d'un logements.
+Nous pouvons vérifier cela avec le graphique ci-dessous, qui est une régression linéaire.
+On remarque que le coefficient de corrélation est de 0.86 ce qui signifie qu'il y a une importante influence entre le cout annuel et les émissions de GES émises par un logement.
+
+
+```{r, echo=FALSE, message=FALSE}
+correlation = cor(x = Logement$Emission_GES_5_usages,
+                  y = Logement$Coût_total_5_usages,
+                  method = "spearman")
+# Création du diagramme de dispersion
+plot(Logement$Emission_GES_5_usages, Logement$Coût_total_5_usages,
+     xlab = "Emission GES ECS", ylab = "Coût total 5 usages",
+     main = "régression linéaire")
+# Ajout de la ligne de tendance
+abline(lm(Logement$Coût_total_5_usages ~ Logement$Emission_GES_5_usages),
+       col = "red", lwd = 2)
+
+# Ajout de la légende pour la corrélation de rang de Spearman
+legend("topright", legend = paste("Coefficient de Corrélation =", round(correlation, 3)),
+       bty = "n")
+
+```
+
+Comme nous l'avons vu plus l'étiquette DPE est basse plus le coût annuel est important, grâce à cette régression linéaire et au coefficient de corrélation nous pouvons le prouver
