@@ -7,6 +7,13 @@ if (!requireNamespace("plotly", quietly = TRUE)) install.packages("plotly")
 if (!requireNamespace("httr", quietly = TRUE)) install.packages("httr")
 if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("jsonlite")
 if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("shinydashboard")
+if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("rsconnect")
+if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("readr")
+if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("leaflet")
+if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("DT")
+if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("shinythemes")
+if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("shinydashboardPlus")
+
 
 library(shiny)
 library(bslib)
@@ -16,8 +23,20 @@ library(httr)
 library(jsonlite)
 library(plotly)
 library(shinydashboard)
+library(readr)
+library(leaflet)
+library(DT)
+library(shinythemes)
+library(shinydashboardPlus)
+#detach(package:shinydashboardPlus, unload = TRUE)
 
 #Apparence :
+
+Nom_Etiquettes = c("A", "B", "C", "D", "E", "F", "G")
+Nom_type_batiment = c("maison","appartement","immeuble")
+code = c("48200", "48220" ,"48800", "48400", "48340", "48500", "48310", "48100", "48700", "48230", "48170", "48150", "48600", "48160",
+         "48140", "48190", "48240", "48370", "48120", "48300" ,"48330", "48000" ,"48210" ,"48320" ,"48110",
+         "48260", "48250", "48130")
 
 dashboardPage(
   dashboardHeader(title = "GreenTech Solution"),
@@ -26,7 +45,9 @@ dashboardPage(
   dashboardSidebar(
       sidebarMenu(
       menuItem("Contexte", tabName = "contexte", icon = icon("poo")),
-      menuItem("Globale", tabName = "globale", icon = icon("th"))
+      menuItem("Globale", tabName = "globale", icon = icon("th")),
+      menuItem("Régression Linéaire", tabName = "regression", icon = icon("chart-line"))
+      
   )),
   
   
@@ -48,42 +69,144 @@ dashboardPage(
     }
   ")),
     
+    tags$head(tags$style('.box-header{ display: none}')),
+    
     
       tabItems(
         # CONTEXTE
         tabItem(tabName = "contexte",h2("Contexte"),
           fluidRow(
       
-                box(h4("Les DPE de la Lozère \n"),
-                p("Enedis a fait ceci machin truc et bla bla bla"),height=250),
+                shinydashboard::box(h2("Les DPE de la Lozère \n"),
+                h3("GreenTech Solutions vous propose un dashboard complet sur les données du département de la Lozère! \n"),
+                h3("Pour mieux comprendre l'impact des DPE sur les consommation des logements !"),height=250),
                 
-                
+               
+                fluidRow(
                 column(3, selectInput(inputId = "type_batiment_choix",
                             label = "Sélectionner le type de logement",
                             choices = c("Tout", Nom_type_batiment),
-                            width = 350) ),
+                            width = 350 )),
                 
-                column(3, selectInput(inputId = "etiquette_dpe_choix",
-                            label = "Sélectionner le DPE",
-                            choices = c("Tout", Nom_Etiquettes),
-                            width = 350) ),
+                column(3, selectInput(inputId = "code_postal_choix",
+                            label = "Sélectionner le code postal",
+                            choices = c("Tout", code),
+                            width = 350 )),
                 
           
-                box(div(class = "big-text", icon("home", class = "custom-icon") ,textOutput("nbLogements")),h4("Logements", align = "center"),height = 175,width=3),
-                box(div(class = "big-text", icon("building", class = "custom-icon") ,textOutput("moyAnneeConstru")),h4("Moyenne d'année de construction", align = "center"),height = 175,width=3),
+                shinydashboard::box(div(class = "big-text", icon("home", class = "custom-icon")
+                        ,textOutput("nbLogements")),h4("Logements", align = "center"),
+                        height = 175, width = 3),
                 
-                  
-                box(div(style = "display: flex; justify-content: center;",  # Centre horizontalement
-                        plotlyOutput("RepartitionDPE", height = "375px")  # Ajoute le graphique ici
-                ), height = 400)
+                shinydashboard::box(div(class = "big-text", icon("building", class = "custom-icon")
+                        ,textOutput("moyAnneeConstru")),h4("Moyenne d'année de construction", align = "center"),
+                        height = 175, width = 3)
+                
+                ,height = 250, style="margin: 0;"),
+                
+                
+                shinydashboard::box(p(style = "text-align: center;font-size: 20px;","Carte des adresses avec la couleurs des DPE") ,
+                    leafletOutput("carteContexte", height = "375px" ), height= 450 ),
+                
+                shinydashboard::box(div(style = "display: flex; justify-content: center;",  # Centre horizontalement
+                        plotlyOutput("RepartitionDPE", height = "425px")  # Ajoute le graphique ici
+                ), height = 450),
+                
+                
+                tabsetPanel(id="dataset",
+                              tabPanel("Utilisé",DT::dataTableOutput("tableauContexteUsed")),
+                              tabPanel("All",DT::dataTableOutput("tableauContexteAll")))
+               
           )
         ),
         
+        
+        
+        
         # Stats Globale
         tabItem(tabName = "globale",
-                h2("globale"),
-                fluidRow(box(plotlyOutput("RepartitionConso", height = 400)))
+                h2("Informations globales"),
+                fluidRow(box(plotlyOutput("RepartitionConso", height = 400)),
+                         
+                         fluidRow(h2(style = "text-align: center;","Vos tris"),
+                         column(3, selectInput(inputId = "type_logement_choix2",
+                                     label = "Sélectionner le type de logement",
+                                     choices = c("Tout", Nom_type_batiment),
+                                     width = 350 ),
+                         
+                         selectInput(inputId = "DPE_choix2",
+                                     label = "Sélectionner le DPE",
+                                     choices = c("Tout", Nom_Etiquettes),
+                                     width = 350 ),
+                         
+                         selectInput(inputId = "code_postal_choix2",
+                                     label = "Sélectionner le code postal",
+                                     choices = c("Tout", code),
+                                     width = 350 ),
+                         
+                         checkboxInput(inputId = "valeurs_aberrantes",
+                                       label = "Supprimer des valeurs pour mieux lire",
+                                       value = FALSE,
+                                       width = 350),
+                         
+                         sliderInput(inputId = "choix_annee",
+                                     label = "Choisissez une période",
+                                     min = 1750, max = 2024, value = c(1750,2024)) )
+                         
+                         ,height = 400, style="margin: 0; "),
+                         
+                         box(plotlyOutput("boxplot", height = 375), height = 400),
+                         
+                         box(plotlyOutput("anneeConstru", height = 375), height = 400),
+                         
+                         tabsetPanel(id="dataset",
+                                     tabPanel("Utilisé",DT::dataTableOutput("tableauGlobaleUsed")),
+                                     tabPanel("All",DT::dataTableOutput("tableauGlobaleAll")))
+
+                         )
+        ),
+        
+        #Page de  la régression au choix
+        tabItem(tabName = "regression",
+                h2("Régression Linéaire entre 2 variables aux choix !"),
+                  
+                selectInput(inputId = "choix_X",
+                            label = "Sélectionner la variable X",
+                            choices = c("Coût_auxiliaires", "Conso_auxiliaires_é_finale",
+                                        
+                                        "Coût_refroidissement", "Conso_refroidissement_é_finale",
+                                        
+                                        "Coût_éclairage", "Conso_éclairage_é_finale",
+                                        
+                                        "Coût_ECS",   "Conso_ECS_é_finale",
+                                        
+                                        "Coût_chauffage", "Conso_chauffage_é_finale",
+                                        
+                                        "Coût_total_5_usages",  "Conso_5_usages_é_finale", "Emission_GES_5_usages"),
+                            width = 350 ),
+                
+                selectInput(inputId = "choix_Y",
+                            label = "Sélectionner la variable Y",
+                            choices = c("Coût_auxiliaires", "Conso_auxiliaires_é_finale",
+                                        
+                                        "Coût_refroidissement", "Conso_refroidissement_é_finale",
+                                        
+                                        "Coût_éclairage", "Conso_éclairage_é_finale",
+                                        
+                                        "Coût_ECS",   "Conso_ECS_é_finale",
+                                        
+                                        "Coût_chauffage", "Conso_chauffage_é_finale",
+                                        
+                                        "Coût_total_5_usages",  "Conso_5_usages_é_finale", "Emission_GES_5_usages"),
+                            width = 350 ),
+                
+                plotOutput("RegressionGraph", height=400), 
+                h2(textOutput("RegressionText"), style = "text-align: center;"))
         )
-      )
+        
+        
+      ),
+  
+    controlbar = dashboardControlbar(skinSelector())
   )
-)
+
